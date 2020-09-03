@@ -27,29 +27,82 @@ const movieDB = {
 const adv = document.querySelectorAll('.promo__adv'),
     poster = document.querySelector('.promo__bg'),
     genre = document.querySelector('.promo__genre'),
-    moviesList = document.querySelector(".promo__interactive-list");
+    moviesList = document.querySelector(".promo__interactive-list"),
+    addForm = document.querySelector('.add'),
+    addInput = addForm.querySelector('.adding__input'),
+    checkBox = addForm.querySelector('[type="checkbox"]');
+
+addForm.addEventListener('submit', (event) => {
+    event.preventDefault(); // screen does not blink
+
+    let newFilm = addInput.value;
+    const favorite = checkBox.checked;
 
 
-adv.forEach(item => {
-    item.remove();
+    if (newFilm) {
+
+        if (newFilm.length > 21) {
+            newFilm = `${newFilm.substring(0, 22)}...`;
+        }
+
+        if (favorite) {
+            console.log('Favorite movie !!');
+        }
+        movieDB.movies.push(newFilm);
+        sortArr(movieDB.movies);
+        creatMoviesList(movieDB.movies, moviesList);
+    }
+
+
+
+    event.target.reset();
+
 });
 
-//      same action as aove but done another way
-// adv.forEach(function (item) {
-//     item.remove();
-// })
+const deleteAdv = (arr) => {
+    arr.forEach(item => {
+        item.remove();
+    });
+};
 
-genre.textContent = 'DRAMA';
 
-poster.style.backgroundImage = 'url("img/bg.jpg")';
+const makeChanges = () => {
+    genre.textContent = 'DRAMA';
+    poster.style.backgroundImage = 'url("img/bg.jpg")';
+};
 
-moviesList.innerHTML = '';
 
-movieDB.movies.sort();
+const sortArr = (arr) => {
+    arr.sort();
+};
 
-movieDB.movies.forEach((item, i) => {
-    moviesList.innerHTML += `
+
+function creatMoviesList(films, parent) {
+    parent.innerHTML = '';
+    sortArr(films);
+
+
+    films.forEach((item, i) => {
+        parent.innerHTML += `
         <li class="promo__interactive-item">${i+1}.${item}
         <div class="delete"></div>
         </li>`;
-});
+    });
+
+    document.querySelectorAll('.delete').forEach((btn, i) => {
+        btn.addEventListener('click', () => {
+            btn.parentElement.remove();
+            movieDB.movies.splice(i, 1);
+            creatMoviesList(films, parent);
+
+        });
+    });
+}
+
+deleteAdv(adv);
+
+makeChanges();
+
+// sortArr(movieDB.movies);
+
+creatMoviesList(movieDB.movies, moviesList);
